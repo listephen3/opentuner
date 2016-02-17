@@ -1,5 +1,7 @@
+#!/usr/bin/python
 import opentuner
 import argparse
+import sys
 from opentuner.search import manipulator
 
 
@@ -17,21 +19,60 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def run(self, desired_result, input, limit):
     cfg = desired_result.configuration.data
     counter = {}
-    returnString = ''
+    parameterList = ''
     for i in self.flagList:
       counter[i] = 0
 
+    #we're iterating through the duplicate of flags here
+    #and if it's appeared less than the specified # of times, we
+    #add it to the parameter List
     for i in cfg['order']:
       if counter[i] < cfg[i]:
-        returnString += i
+        parameterList += i + ' '
       counter[i] += 1
+    
+    #.c to .ll
+    output = self.call_program('clang -O0 -S -emit-llvm matrixmultiply.cpp -o matrixmultiply.ll')
+    if output['returncode'] != 0:
+      print output
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
-    return opentuner.resultsdb.models.Result(time=len(returnString))
+    #.ll to .bc
+    output = self.call_program('opt ' + parameterList + ' matrixmultiply.ll -o matrixmultiply.bc')
+    if output['returncode'] != 0:
+      print output
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+
+    #.bc to #.s
+    output = self.call_program('llc matrixmultiply.bc -o matrixmultiply.s')
+    if output['returncode'] != 0:
+      print output
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+
+    #.s to #.o
+    output = self.call_program('as matrixmultiply.s -o matrixmultiply.o')
+    if output['returncode'] != 0:
+      print output
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+
+    #.o to .out
+    output = self.call_program('clang -lstdc++ -lm matrixmultiply.out')
+    if output['returncode'] != 0:
+      print output
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+
+    output = self.call_program('./matrixmultiply.out')
+    if output['returncode'] != 0:
+      print output
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR') 
+
+    #parameterList represents the parameters we're passing into opt
+    sys.exit()
+    return opentuner.resultsdb.models.Result(time=output['time'])
 
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
     flagListDuplicate = []
-    print self.flagList
     for i in range(3):
       flagListDuplicate.extend(self.flagList)
 
