@@ -2,10 +2,39 @@
 import opentuner
 import argparse
 import sys
+import time
 from opentuner.search import manipulator
 
 
+source_name = 'matrixmultiply.cpp'
+source_file_name = source_name.split('.')[0]
+ll_int = source_file_name + '.ll'
+bc_int = source_file_name + '.bc'
+s_int = source_file_name + '.s'
+o_int = source_file_name + '.o'
+out_int = source_file_name + '.out'
+
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
+args_blacklist = ['-aa-eval', '-asan', '-asan-module', 
+'-datalayout', '-deadarghaX0r', 'debug-aa', 'debug-ir', '-dfsan', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', 
+'-extract-blocks', '-generic-to-nvvm', '-insert-gcov-profiling', '-internalize', '-iv-users',
+'-msan', '-no-aa',
+'-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
+'-tsan', 
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
+]
+#extract-blocks makes each run take forever
+
+args_list = ['-aa-eval', '-adce', '-alloca-hoisting', '-always-inline', '-argpromotion', '-asan', '-asan-module', '-basicaa', '-basiccg', '-bb-vectorize', '-block-freq', '-bounds-checking', '-branch-prob', '-break-crit-edges', '-codegenprepare', '-constmerge', '-constprop', '-correlated-propagation', '-cost-model', '-count-aa', 
+
+'-da', '-datalayout', '-dce', '-deadargelim', '-deadarghaX0r', '-debug-aa', '-debug-ir', '-delinearize', '-dfsan', '-die', '-domfrontier', '-domtree', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', '-dse',
+
+'-early-cse', '-extract-blocks', '-functionattrs', '-generic-to-nvvm', '-globaldce', '-globalopt', '-globalsmodref-aa', '-gvn', '-indvars', '-inline', '-inline-cost', '-insert-gcov-profiling', '-instcombine', '-instcount', '-instnamer', '-instsimplify', '-internalize', '-intervals', '-ipconstprop', '-ipsccp', '-iv-users',
+
+'-jump-threading', '-lazy-value-info', '-lcssa', '-libcall-aa', '-licm', '-lint', #'-loop-deletion', '-loop-extract', '-loop-extract-single', '-loop-idiom', '-loop-instsimplify', '-loop-reduce', '-loop-reroll', '-loop-rotate', '-loop-simplify', '-loop-unroll', '-loop-unswitch', '-loop-vectorize', '-loops', #'-lower-expect', '-loweratomic', '-lowerinvoke', '-lowerswitch',
+
+#'-mem2reg', '-memcpyopt', '-memdep', '-mergefunc', '-mergereturn'
+]
 
 class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def __init__(self, *pargs, **kwargs):
@@ -30,44 +59,64 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       if counter[i] < cfg[i]:
         parameterList += i + ' '
       counter[i] += 1
+
+    print parameterList
     
     #.c to .ll
-    output = self.call_program('clang -O0 -S -emit-llvm matrixmultiply.cpp -o matrixmultiply.ll')
+    output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int)
+    print 'converting .c to .ll took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print output
+      print "error at .c to .ll step"
+      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.ll to .bc
-    output = self.call_program('opt ' + parameterList + ' matrixmultiply.ll -o matrixmultiply.bc')
+    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int)
+    print 'converting .c to .ll took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print output
+      print "error at .ll to .bc step"
+      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
-    #.bc to #.s
-    output = self.call_program('llc matrixmultiply.bc -o matrixmultiply.s')
+    #.bc to .s
+    output = self.call_program('llc ' + bc_int + ' -o ' + s_int)
+    print 'converting .bc to .s took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print output
+      print "error at .bc to .s step"
+      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
-    #.s to #.o
-    output = self.call_program('as matrixmultiply.s -o matrixmultiply.o')
+    #.s to .o
+    output = self.call_program('as ' + s_int + ' -o ' + o_int)
+    print 'converting .s to .o took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print output
+      print "error at s to .o step"
+      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out
-    output = self.call_program('clang -lstdc++ -lm matrixmultiply.out')
+    output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int)
+    print 'converting .o to .out took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print output
+      print "error at .o to .out"
+      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
-    output = self.call_program('./matrixmultiply.out')
+    #finally running the output program
+    output = self.call_program('./' + out_int)
+    print 'running the code took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print output
+      print "error at running code step"
+      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR') 
 
     #parameterList represents the parameters we're passing into opt
-    sys.exit()
     return opentuner.resultsdb.models.Result(time=output['time'])
 
   def manipulator(self):
@@ -83,9 +132,10 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     return m
 
   def getArgs(self):
+    """
     output = self.call_program('opt --help')['stdout']
     output = output.split("\n")
-    argsList = []
+    args_list = []
     readingArgs = False
     leadingSpaces = 0
 
@@ -96,11 +146,15 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
         continue
       if readingArgs:
         if (len(i) - len(i.lstrip(' '))) > leadingSpaces:
-          argsList.append(i.lstrip(' ').split(' ')[0])
+          args_list.append(i.lstrip(' ').split(' ')[0])
         else:
           break
+    """
+    for i in args_blacklist:
+      if i in args_list:
+        args_list.remove(i)
+    return args_list
 
-    return argsList
       
 if __name__ == '__main__':
   opentuner.init_logging()
