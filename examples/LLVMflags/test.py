@@ -5,8 +5,8 @@ import sys
 import time
 from opentuner.search import manipulator
 
-
-source_name = 'matrixmultiply.cpp'
+timeout = 5 #seconds
+source_name = 'raytracer.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
 bc_int = source_file_name + '.bc'
@@ -16,17 +16,26 @@ out_int = source_file_name + '.out'
 
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
-'-aa-eval', '-asan', '-asan-module', '-bounds-checking', '-codegenprepare', '-datalayout', 
-'-deadarghaX0r', '-debug-aa', '-debug-ir', '-dfsan', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', 
-'-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', 
-'-extract-blocks', '-generic-to-nvvm', '-gvn', '-insert-gcov-profiling', '-internalize', '-iv-users',
-'-loop-reduce', '-mem2reg', '-memcpyopt', '-metarenamer', '-module-debuginfo', '-msan', '-no-aa',
-'-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', 
-'-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', 
-'-print-used-types', '-sample-profile', '-tsan', '-view-callgraph', '-view-cfg', '-view-cfg-only', 
-'-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
-]
+#Analysis Passes that might be useful
+'-aa-eval', '-debug-aa', '-iv-users', '-scev-aa',
+#Transform passes that might be useful
+'-internalize', '-gvn', '-loop-reduce', '-mem2reg', '-memcpyopt', '-sink', 
+#Other passes that have special use cases
+'-verify', 
 
+#Analysis Passes that unnecessary
+'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+ '-instcount', '-module-debuginfo', '-no-aa',
+ '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
+#Utility Passes that unnecessary
+'-deadarghaX0r', '-extract-blocks', '-instnamer',
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
+#Transform passes that unecessary
+'-codegenprepare', 
+#These passes don't have much documentation
+'-asan', '-asan-module', '-dfsan','-msan', '-tsan', '-bounds-checking', '-generic-to-nvvm', 
+'-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile',
+]
 
 args_list = [
 '-aa-eval', '-adce', '-alloca-hoisting', '-always-inline', '-argpromotion', '-asan', '-asan-module', 
@@ -77,71 +86,71 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
 
     print parameterList
     
+    '''
     #.c to .ll
-    output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int)
+    output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
     print 'converting .c to .ll took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print output
       print "error at .c to .ll step"
-      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+    '''
 
     #.ll to .bc
-    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int)
-    print 'converting .ll to .bc took ' + str(output['time']) + ' seconds'
+    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
+    #print 'converting .ll to .bc took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print output
       print "error at .ll to .bc step"
-      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.bc to .s
-    output = self.call_program('llc ' + bc_int + ' -o ' + s_int)
-    print 'converting .bc to .s took ' + str(output['time']) + ' seconds'
+    output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
+    #print 'converting .bc to .s took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print output
       print "error at .bc to .s step"
-      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.s to .o
-    output = self.call_program('as ' + s_int + ' -o ' + o_int)
-    print 'converting .s to .o took ' + str(output['time']) + ' seconds'
+    output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
+    #print 'converting .s to .o took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print output
       print "error at s to .o step"
-      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out
-    output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int)
-    print 'converting .o to .out took ' + str(output['time']) + ' seconds'
+    output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int, limit = timeout)
+    #print 'converting .o to .out took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print output
       print "error at .o to .out"
-      sys.exit()
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #finally running the output program
-    output = self.call_program('./' + out_int)
-    print 'running the code took ' + str(output['time']) + ' seconds'
+    output = self.call_program('./' + out_int, limit = timeout)
+    print 'running the code took ' + str(output['time']) + ' seconds\n'
     if output['returncode'] != 0:
-      print output
       print "error at running code step"
-      sys.exit()
-      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR') 
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
-    #parameterList represents the parameters we're passing into opt
     return opentuner.resultsdb.models.Result(time=output['time'])
+
+    """
+    output = self.call_program('g++ -O2 -lm ' + source_name + ' -o ' + 'test.out', limit = timeout)
+    if output['returncode'] != 0:
+      print "error at compilation"
+    
+    output = self.call_program('./' + 'test.out', limit = timeout)
+    print 'running the code took ' + str(output['time']) + ' seconds\n'
+    return opentuner.resultsdb.models.Result(time=output['time'])
+    """
+
 
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
     flagListDuplicate = []
-    for i in range(1):
+    for i in range(3):
       flagListDuplicate.extend(self.flagList)
 
     for f in self.flagList:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
     m.add_parameter(manipulator.PermutationParameter('order', flagListDuplicate))
     
     return m

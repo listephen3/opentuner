@@ -16,15 +16,30 @@ out_int = source_file_name + '.out'
 
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
-'-aa-eval', '-asan', '-asan-module', '-bounds-checking', '-codegenprepare', '-datalayout', 
-'-deadarghaX0r', '-debug-aa', '-debug-ir', '-dfsan', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', 
-'-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', 
-'-extract-blocks', '-generic-to-nvvm', '-gvn', '-insert-gcov-profiling', '-internalize', '-iv-users',
-'-loop-reduce', '-mem2reg', '-memcpyopt', '-metarenamer', '-module-debuginfo', '-msan', '-no-aa',
-'-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', 
-'-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', 
-'-print-used-types', '-sample-profile', '-scev-aa', '-sink', '-tsan', '-view-callgraph', '-view-cfg', '-view-cfg-only', 
-'-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
+#Analysis Passes that unnecessary
+'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+ '-instcount', '-module-debuginfo', '-no-aa',
+ '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
+
+#Analysis Passes that might be useful
+'-aa-eval', '-debug-aa', '-iv-users', '-scev-aa',
+
+#Utility Passes that unnecessary
+'-deadarghaX0r', '-extract-blocks', '-instnamer',
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
+
+#Transform passes that unecessary
+'-codegenprepare', 
+
+#Transform passes that might be useful
+'-internalize', '-gvn', '-loop-reduce', '-mem2reg', '-memcpyopt', '-sink', 
+
+#Other passes that have special use cases
+'-verify', 
+
+#These passes don't have much documentation
+'-asan', '-asan-module', '-dfsan','-msan', '-tsan', '-bounds-checking', '-generic-to-nvvm', 
+'-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile',
 ]
 
 
