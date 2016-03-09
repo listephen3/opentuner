@@ -17,21 +17,19 @@ out_int = source_file_name + '.out'
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
 #Analysis Passes that might be useful
-'-aa-eval', '-debug-aa', '-iv-users', '-scev-aa',
+'-iv-users', '-scev-aa',
 #Transform passes that might be useful
-'-internalize', '-gvn', '-loop-reduce', '-mem2reg', '-memcpyopt', '-sink', 
-#Other passes that have special use cases
-'-verify', 
+'-internalize', '-gvn', '-loop-reduce', '-memcpyopt', '-sink', 
 
 #Analysis Passes that unnecessary
-'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+'-aa-eval', '-debug-aa', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
  '-instcount', '-module-debuginfo', '-no-aa',
  '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
 #Utility Passes that unnecessary
-'-deadarghaX0r', '-extract-blocks', '-instnamer',
+'-deadarghaX0r', '-extract-blocks', '-instnamer', '-mem2reg',
 '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
 #Transform passes that unecessary
-'-codegenprepare', 
+'-codegenprepare', '-verify', 
 #These passes don't have much documentation
 '-asan', '-asan-module', '-dfsan','-msan', '-tsan', '-bounds-checking', '-generic-to-nvvm', 
 '-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile',
@@ -91,7 +89,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
     print 'converting .c to .ll took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print "error at .c to .ll step"
+      print "error at .c to .ll step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     '''
 
@@ -99,38 +97,38 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
     #print 'converting .ll to .bc took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print "error at .ll to .bc step"
+      print "error at .ll to .bc step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.bc to .s
     output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
     #print 'converting .bc to .s took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print "error at .bc to .s step"
+      print "error at .bc to .s step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.s to .o
     output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
     #print 'converting .s to .o took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print "error at s to .o step"
+      print "error at s to .o step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out
     output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int, limit = timeout)
     #print 'converting .o to .out took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
-      print "error at .o to .out"
+      print "error at .o to .out\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #finally running the output program
     output = self.call_program('./' + out_int, limit = timeout)
-    print 'running the code took ' + str(output['time']) + ' seconds\n'
-    if output['returncode'] != 0:
-      print "error at running code step"
+    if ('ERROR' in output['stdout']) or output['returncode'] != 0:
+      print 'error at running code step\n'
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
-
-    return opentuner.resultsdb.models.Result(time=output['time'])
+    else:
+      print 'running the code took ' + str(output['time']) + ' seconds\n'
+      return opentuner.resultsdb.models.Result(time=output['time'])
 
     """
     output = self.call_program('g++ -O2 -lm ' + source_name + ' -o ' + 'test.out', limit = timeout)
@@ -146,11 +144,11 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
     flagListDuplicate = []
-    for i in range(3):
+    for i in range(6):
       flagListDuplicate.extend(self.flagList)
 
     for f in self.flagList:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 6))
     m.add_parameter(manipulator.PermutationParameter('order', flagListDuplicate))
     
     return m
