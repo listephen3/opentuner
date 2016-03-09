@@ -19,20 +19,22 @@ args_blacklist = [
 #Analysis Passes that might be useful
 '-iv-users', '-scev-aa',
 #Transform passes that might be useful
-'-internalize', '-gvn', '-loop-reduce', '-memcpyopt', '-sink', 
-
+'-internalize', '-loop-reduce', '-sink', 
 #Analysis Passes that unnecessary
-'-aa-eval', '-debug-aa', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
- '-instcount', '-module-debuginfo', '-no-aa',
- '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
+'-aa-eval', '-debug-aa', '-instcount', '-module-debuginfo', '-lint', '-delinearize', '-cost-model', 
+'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+'-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
 #Utility Passes that unnecessary
-'-deadarghaX0r', '-extract-blocks', '-instnamer', '-mem2reg',
-'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
-#Transform passes that unecessary
-'-codegenprepare', '-verify', 
+'-deadarghaX0r', '-extract-blocks', '-instnamer', '-reg2mem', 
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only', 
+#Transform passes that unnecessary
+'-codegenprepare', '-break-crit-edges', '-loop-extract', '-loop-extract-single',  
+'-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug',
 #These passes don't have much documentation
 '-asan', '-asan-module', '-dfsan','-msan', '-tsan', '-bounds-checking', '-generic-to-nvvm', 
-'-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile',
+'-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile', '-structurizecfg',
+#Used separately in the code below
+'-verify', 
 ]
 
 args_list = [
@@ -46,7 +48,7 @@ args_list = [
 '-globaldce', '-globalopt', '-globalsmodref-aa', '-gvn', '-indvars', '-inline', '-inline-cost', 
 '-insert-gcov-profiling', '-instcombine', '-instcount', '-instnamer', '-instsimplify', '-internalize', 
 '-intervals', '-ipconstprop', '-ipsccp', '-iv-users', '-jump-threading', '-lazy-value-info', '-lcssa', 
-'-libcall-aa', '-licm', '-lint', '-loop-deletion', '-loop-extract', '-loop-extract-single', '-loop-idiom', 
+'-libcall-aa', '-licm', '-lint', '-loop-deletion', '-loop-extract', '-loop-idiom', 
 '-loop-instsimplify', '-loop-reduce', '-loop-reroll', '-loop-rotate', '-loop-simplify', '-loop-unroll', 
 '-loop-unswitch', '-loop-vectorize', '-loops', '-lower-expect', '-loweratomic', '-lowerinvoke', 
 '-lowerswitch', '-mem2reg', '-memcpyopt', '-memdep', '-mergefunc', '-mergereturn', 
@@ -81,6 +83,8 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       if counter[i] < cfg[i]:
         parameterList += i + ' '
       counter[i] += 1
+
+    parameterList += ' -verify'
 
     print parameterList
     
@@ -124,7 +128,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     #finally running the output program
     output = self.call_program('./' + out_int, limit = timeout)
     if ('ERROR' in output['stdout']) or output['returncode'] != 0:
-      print 'error at running code step\n'
+      print 'error at running code\n'
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     else:
       print 'running the code took ' + str(output['time']) + ' seconds\n'

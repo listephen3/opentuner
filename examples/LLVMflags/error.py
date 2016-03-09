@@ -5,8 +5,8 @@ import sys
 import time
 from opentuner.search import manipulator
 
-
-source_name = 'matrixmultiply.cpp'
+timeout = 5 #seconds
+source_name = 'raytracer.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
 bc_int = source_file_name + '.bc'
@@ -16,30 +16,25 @@ out_int = source_file_name + '.out'
 
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
-#Analysis Passes that unnecessary
-'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
- '-instcount', '-module-debuginfo', '-no-aa',
- '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
-
 #Analysis Passes that might be useful
-'-aa-eval', '-debug-aa', '-iv-users', '-scev-aa',
-
-#Utility Passes that unnecessary
-'-deadarghaX0r', '-extract-blocks', '-instnamer',
-'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
-
-#Transform passes that unecessary
-'-codegenprepare', 
-
+'-iv-users', '-scev-aa',
 #Transform passes that might be useful
-'-internalize', '-gvn', '-loop-reduce', '-mem2reg', '-memcpyopt', '-sink', 
-
-#Other passes that have special use cases
-'-verify', 
-
+'-internalize', '-loop-reduce', '-sink', 
+#Analysis Passes that unnecessary
+'-aa-eval', '-debug-aa', '-instcount', '-module-debuginfo', '-lint', '-delinearize', '-cost-model', 
+'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+'-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-module', '-print-used-types',
+#Utility Passes that unnecessary
+'-deadarghaX0r', '-extract-blocks', '-instnamer', '-reg2mem', 
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only', 
+#Transform passes that unnecessary
+'-codegenprepare', '-break-crit-edges', '-loop-extract', '-loop-extract-single',  
+'-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug',
 #These passes don't have much documentation
 '-asan', '-asan-module', '-dfsan','-msan', '-tsan', '-bounds-checking', '-generic-to-nvvm', 
-'-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile',
+'-datalayout', '-debug-ir', '-insert-gcov-profiling', '-metarenamer', '-sample-profile', '-structurizecfg', 
+#Used separately in the code below
+'-verify', 
 ]
 
 
@@ -54,7 +49,7 @@ args_list = [
 '-globaldce', '-globalopt', '-globalsmodref-aa', '-gvn', '-indvars', '-inline', '-inline-cost', 
 '-insert-gcov-profiling', '-instcombine', '-instcount', '-instnamer', '-instsimplify', '-internalize', 
 '-intervals', '-ipconstprop', '-ipsccp', '-iv-users', '-jump-threading', '-lazy-value-info', '-lcssa', 
-'-libcall-aa', '-licm', '-lint', '-loop-deletion', '-loop-extract', '-loop-extract-single', '-loop-idiom', 
+'-libcall-aa', '-licm', '-lint', '-loop-deletion', '-loop-extract', '-loop-idiom', 
 '-loop-instsimplify', '-loop-reduce', '-loop-reroll', '-loop-rotate', '-loop-simplify', '-loop-unroll', 
 '-loop-unswitch', '-loop-vectorize', '-loops', '-lower-expect', '-loweratomic', '-lowerinvoke', 
 '-lowerswitch', '-mem2reg', '-memcpyopt', '-memdep', '-mergefunc', '-mergereturn', 
@@ -69,8 +64,6 @@ args_list = [
 '-targetlibinfo', '-tbaa', '-tsan', '-verify', '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', 
 '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only'
 ]
-
-args_list = "-loop-rotate -sroa -licm -loop-vectorize -licm -basicaa".split(' ')
 
 
 class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
@@ -97,25 +90,55 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
 
     #.ll to .bc
     output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = 5)
-    print 'converting .ll to .bc took ' + str(output['time']) + ' seconds'
     if output['time'] == float('inf'):
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     if output['returncode'] != 0:
       print "error at .ll to .bc step\n\n\n\n"
-      if (len(parameterList) == 2):
-        sys.exit()
       return opentuner.resultsdb.models.Result(time=len(parameterList))
 
+    #.bc to .s
+    output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
+    if output['time'] == float('inf'):
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+    if output['returncode'] != 0:
+      print "error at .bc to .s step\n\n\n\n"
+      return opentuner.resultsdb.models.Result(time=len(parameterList))
+
+    #.s to .o
+    output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
+    if output['time'] == float('inf'):
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+    if output['returncode'] != 0:
+      print "error at s to .o step\n\n\n\n"
+      return opentuner.resultsdb.models.Result(time=len(parameterList))
+
+    #.o to .out
+    output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int, limit = timeout)
+    if output['time'] == float('inf'):
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+    if output['returncode'] != 0:
+      print "error at .o to .out\n\n\n\n"
+      return opentuner.resultsdb.models.Result(time=len(parameterList))
+
+    #finally running the output program
+    output = self.call_program('./' + out_int, limit = timeout)
+    if output['time'] == float('inf'):
+      print 'Running the program, out of time\n\n\n\n'
+      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+    if ('ERROR' in output['stdout']) or output['returncode'] != 0:
+      print 'error at running code\n\n\n\n'
+      return opentuner.resultsdb.models.Result(time=len(parameterList))
+    
     return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
     flagListDuplicate = []
-    for i in range(3):
+    for i in range(1):
       flagListDuplicate.extend(self.flagList)
 
     for f in self.flagList:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
     m.add_parameter(manipulator.PermutationParameter('order', flagListDuplicate))
     
     return m
