@@ -126,13 +126,15 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #finally running the output program
-    output = self.call_program('./' + out_int, limit = timeout)
+    argument = './' + out_int
+    output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \"$tt\"', limit = timeout)
     if ('ERROR' in output['stdout']) or output['returncode'] != 0:
       print 'error at running code\n'
+      print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     else:
-      print 'running the code took ' + str(output['time']) + ' seconds\n'
-      return opentuner.resultsdb.models.Result(time=output['time'])
+      print 'running the code took ' + str(float(output['stdout'])/1000) + ' seconds\n'
+      return opentuner.resultsdb.models.Result(time=float(output['stdout'])/1000)
 
     """
     output = self.call_program('g++ -O2 -lm ' + source_name + ' -o ' + 'test.out', limit = timeout)
