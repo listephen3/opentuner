@@ -21,96 +21,23 @@ args_blacklist = [
 #Transform passes that might be useful
 
 #Analysis Passes that unnecessary
+'-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', '-print-memoryssa', '-print-module',
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only',
+'-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+
 
 #Utility Passes that unnecessary
 
 #Transform passes that unnecessary
 
 #These passes don't have much documentation
-'-aa', '-aa-eval', '-add-discriminators', '-alignment-from-assumptions', '-alloca-hoisting', '-always-inline', 
-'-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features', 
-'-asan', '-asan-module', '-assumption-cache-tracker', '-atomic-expand', '-bb-vectorize',  
-'-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa', 
-'-codegenprepare', '-consthoist', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', 
-'-delinearize', '-demanded-bits', '-dfsan', '-divergence', '-dot-callgraph', '-dot-cfg', 
-'-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', 
-'-dot-regions', '-dot-regions-only', '-dwarfehprepare', '-elim-avail-extern', '-external-aa', 
-'-extract-blocks', '-flattencfg', '-float2int', '-forceattrs', '-function-import', 
-'-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', 
-'-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', 
-'-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-accesses', '-loop-data-prefetch', 
-'-loop-distribute', '-loop-extract', '-loop-extract-single', '-loop-interchange', 
-'-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-simplifycfg', '-loop-versioning', 
-'-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', 
-'-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-mergereturn', 
-'-metarenamer', '-mldst-motion', '-module-debuginfo', '-msan', '-nary-reassociate', 
-'-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', 
-'-nvptx-lower-alloca', '-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', 
-'-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', 
-'-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', 
-'-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-print-alias-sets', 
-'-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', 
-'-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', 
-'-print-memoryssa', '-print-module', '-reg2mem', '-rewrite-statepoints-for-gc', 
-'-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', 
-'-scalarizer', '-scalarrepl-ssa', '-scev-aa', '-scoped-noalias', 
-'-separate-const-offset-from-gep', '-sgpr-copies', '-si-annotate-control-flow', 
-'-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', 
-'-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-sink', 
-'-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', 
-'-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', 
-'-tsan', '-tti', '-unreachable-mbb-elimination', '-view-callgraph', '-view-cfg', '-view-cfg-only', 
-'-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', 
-'-view-regions-only', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate'
+'-aa', '-aa-eval', '-add-discriminators', '-alignment-from-assumptions', '-alloca-hoisting', '-always-inline', '-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features', '-asan', '-asan-module', '-assumption-cache-tracker', '-atomic-expand', '-bb-vectorize',  '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa', '-codegenprepare', '-consthoist', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize', '-demanded-bits', '-dfsan', '-divergence', '-dot-callgraph',  '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-flattencfg', '-float2int', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-accesses', '-loop-data-prefetch', '-loop-distribute', '-loop-extract', '-loop-extract-single', '-loop-interchange', '-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-simplifycfg', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-mergereturn', '-metarenamer', '-mldst-motion', '-module-debuginfo', '-msan', '-nary-reassociate', '-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree',  '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scalarizer', '-scalarrepl-ssa', '-scev-aa', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-sink', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate', 
 #Used separately in the code below
 '-targetlibinfo', '-verify', 
 ]
 
 args_list = [
-'-aa', '-aa-eval', '-adce', '-add-discriminators', '-alignment-from-assumptions', 
-'-alloca-hoisting', '-always-inline', '-amdgpu-annotate-kernel-features', 
-'-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-argpromotion', '-asan', '-asan-module', 
-'-assumption-cache-tracker', '-atomic-expand', '-barrier', '-basicaa', '-basiccg', 
-'-bb-vectorize', '-bdce', '-block-freq', '-bool-ret-to-int', '-bounds-checking', '-branch-prob', 
-'-break-crit-edges', '-cfl-aa', '-codegenprepare', '-consthoist', '-constmerge', '-constprop', 
-'-correlated-propagation', '-cost-model', '-cross-dso-cfi', '-da', '-dce', '-deadargelim', 
-'-deadarghaX0r', '-delinearize', '-demanded-bits', '-dfsan', '-die', '-divergence', 
-'-domfrontier', '-domtree', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', 
-'-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', 
-'-dse', '-dwarfehprepare', '-early-cse', '-elim-avail-extern', '-external-aa', '-extract-blocks', 
-'-flattencfg', '-float2int', '-forceattrs', '-function-import', '-functionattrs', 
-'-generic-to-nvvm', '-globaldce', '-globalopt', '-globals-aa', '-gvn', '-indvars', '-inferattrs', 
-'-inline', '-insert-gcov-profiling', '-instcombine', '-instcount', '-instnamer', '-instrprof', 
-'-instsimplify', '-internalize', '-intervals', '-ipconstprop', '-ipsccp', '-irce', '-iv-users', 
-'-jump-threading', '-lazy-value-info', '-lcssa', '-licm', '-lint', '-liveintervals', '-livevars', 
-'-load-combine', '-loop-accesses', '-loop-data-prefetch', '-loop-deletion', '-loop-distribute', 
-'-loop-extract', '-loop-extract-single', '-loop-idiom', '-loop-instsimplify', '-loop-interchange', 
-'-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-rotate', '-loop-simplify', 
-'-loop-simplifycfg', '-loop-unroll', '-loop-unswitch', '-loop-vectorize', '-loop-versioning', 
-'-loop-versioning-licm', '-loops', '-lower-expect', '-loweratomic', '-lowerbitsets', 
-'-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-mem2reg', '-memcpyopt', 
-'-memdep', '-memoryssalazy', '-mergefunc', '-mergereturn', '-metarenamer', '-mldst-motion', 
-'-module-debuginfo', '-msan', '-nary-reassociate', '-nvptx-assign-valid-global-names', 
-'-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', 
-'-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', 
-'-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', 
-'-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', 
-'-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-print-alias-sets', 
-'-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', 
-'-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', 
-'-print-memoryssa', '-print-module', '-prune-eh', '-reassociate', '-reg2mem', '-regions', 
-'-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', 
-'-sample-profile', '-sancov', '-scalar-evolution', '-scalarizer', '-scalarrepl', 
-'-scalarrepl-ssa', '-sccp', '-scev-aa', '-scoped-noalias', '-separate-const-offset-from-gep', 
-'-sgpr-copies', '-si-annotate-control-flow', '-si-fix-cf-live-intervals', 
-'-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', 
-'-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-simplifycfg', '-sink', 
-'-sjljehprepare', '-slotindexes', '-slp-vectorizer', '-slsr', '-speculative-execution', '-sroa', 
-'-strip', '-strip-dead-debug-info', '-strip-dead-prototypes', '-strip-debug-declare', 
-'-strip-nondebug', '-structurizecfg', '-tailcallelim', '-targetlibinfo', '-tbaa', '-tsan', 
-'-tti', '-unreachable-mbb-elimination', '-verify', '-view-callgraph', '-view-cfg', 
-'-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', 
-'-view-regions', '-view-regions-only', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate'
+'-aa', '-aa-eval', '-adce', '-add-discriminators', '-alignment-from-assumptions', '-alloca-hoisting', '-always-inline', '-amdgpu-annotate-kernel-features', '-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-argpromotion', '-asan', '-asan-module', '-assumption-cache-tracker', '-atomic-expand', '-barrier', '-basicaa', '-basiccg', '-bb-vectorize', '-bdce', '-block-freq', '-bool-ret-to-int', '-bounds-checking', '-branch-prob', '-break-crit-edges', '-cfl-aa', '-codegenprepare', '-consthoist', '-constmerge', '-constprop', '-correlated-propagation', '-cost-model', '-cross-dso-cfi', '-da', '-dce', '-deadargelim', '-deadarghaX0r', '-delinearize', '-demanded-bits', '-dfsan', '-die', '-divergence', '-domfrontier', '-domtree', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', '-dse', '-dwarfehprepare', '-early-cse', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-flattencfg', '-float2int', '-forceattrs', '-function-import', '-functionattrs', '-generic-to-nvvm', '-globaldce', '-globalopt', '-globals-aa', '-gvn', '-indvars', '-inferattrs', '-inline', '-insert-gcov-profiling', '-instcombine', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-ipconstprop', '-ipsccp', '-irce', '-iv-users', '-jump-threading', '-lazy-value-info', '-lcssa', '-licm', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-accesses', '-loop-data-prefetch', '-loop-deletion', '-loop-distribute', '-loop-extract', '-loop-extract-single', '-loop-idiom', '-loop-instsimplify', '-loop-interchange', '-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-rotate', '-loop-simplify', '-loop-simplifycfg', '-loop-unroll', '-loop-unswitch', '-loop-vectorize', '-loop-versioning', '-loop-versioning-licm', '-loops', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-mem2reg', '-memcpyopt', '-memdep', '-memoryssalazy', '-mergefunc', '-mergereturn', '-metarenamer', '-mldst-motion', '-module-debuginfo', '-msan', '-nary-reassociate', '-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', '-print-memoryssa', '-print-module', '-prune-eh', '-reassociate', '-reg2mem', '-regions', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scalar-evolution', '-scalarizer', '-scalarrepl', '-scalarrepl-ssa', '-sccp', '-scev-aa', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-simplifycfg', '-sink', '-sjljehprepare', '-slotindexes', '-slp-vectorizer', '-slsr', '-speculative-execution', '-sroa', '-strip', '-strip-dead-debug-info', '-strip-dead-prototypes', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tailcallelim', '-targetlibinfo', '-tbaa', '-tsan', '-tti', '-unreachable-mbb-elimination', '-verify', '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate'
 ]
 
 
@@ -136,6 +63,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       counter[i] += 1
 
     parameterList += '-verify'
+    parameterList = '-loop-reduce -loop-reduce'
     print parameterList
 
     '''
