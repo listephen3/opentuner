@@ -6,7 +6,7 @@ import time
 from opentuner.search import manipulator
 
 timeout = 5 #seconds
-source_name = 'raytracer.cpp'
+source_name = 'tsp_ga.cpp'
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 run_number = 0
 
@@ -17,7 +17,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def run(self, desired_result, input, limit):
     global run_number
     if run_number == 0:
-      output = self.call_program('./clang -O2 -lm -lstdc++ ' + source_name + ' -o ' + 'test.out', limit = timeout)
+      output = self.call_program('clang -O3 -lm -lstdc++ ' + source_name + ' -o ' + 'test.out', limit = timeout)
       if output['returncode'] != 0:
         print "error at compilation"
         print output['stderr']

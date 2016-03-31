@@ -6,7 +6,7 @@ import time
 from opentuner.search import manipulator
 
 timeout = 5 #seconds
-source_name = 'raytracer.cpp'
+source_name = 'tsp_ga.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
 bc_int = source_file_name + '.bc'
@@ -20,20 +20,41 @@ args_blacklist = [
 
 #Transform passes that might be useful
 
-#Analysis Passes that unnecessary
+#Unnecessary passes
+'-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features',
+'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+'-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', 
+'-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args',
 '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', '-print-memoryssa', '-print-module',
+'-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow',
 '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only',
-'-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
 
+'-aa', '-aa-eval', '-alloca-hoisting', '-always-inline',  '-asan', '-asan-module', '-assumption-cache-tracker',
+'-atomic-expand', '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa',  '-codegenprepare', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize',  '-dfsan',  '-divergence', '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-extract', '-loop-extract-single', '-loop-reroll', '-loop-reduce', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-metarenamer', '-module-debuginfo', '-msan',  '-nvvm-reflect', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use',  '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate', 
 
-#Utility Passes that unnecessary
-
-#Transform passes that unnecessary
-
-#These passes don't have much documentation
-'-aa', '-aa-eval', '-add-discriminators', '-alignment-from-assumptions', '-alloca-hoisting', '-always-inline', '-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features', '-asan', '-asan-module', '-assumption-cache-tracker', '-atomic-expand', '-bb-vectorize',  '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa', '-codegenprepare', '-consthoist', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize', '-demanded-bits', '-dfsan', '-divergence', '-dot-callgraph',  '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-flattencfg', '-float2int', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-accesses', '-loop-data-prefetch', '-loop-distribute', '-loop-extract', '-loop-extract-single', '-loop-interchange', '-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-simplifycfg', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-mergereturn', '-metarenamer', '-mldst-motion', '-module-debuginfo', '-msan', '-nary-reassociate', '-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree',  '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scalarizer', '-scalarrepl-ssa', '-scev-aa', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-sink', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate', 
 #Used separately in the code below
 '-targetlibinfo', '-verify', 
+
+#'-scev-aa',
+#'-add-discriminators',
+#'-alignment-from-assumptions', 
+#'-bb-vectorize',
+#'-consthoist',
+#'-demanded-bits',
+#'-flattencfg', 
+#'-float2int', 
+#'-loop-data-prefetch',
+#'-loop-accesses',
+#'-loop-interchange',
+#'-loop-load-elim',
+#'-loop-distribute',
+#'-loop-simplifycfg',
+#'-mergereturn',
+#'-mldst-motion', 
+#'-nary-reassociate',
+#'-scalarizer', 
+#'-scalarrepl-ssa', note: alternate with mem2reg
+#'-sink',
 ]
 
 args_list = [
@@ -63,43 +84,37 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       counter[i] += 1
 
     parameterList += '-verify'
-    parameterList = '-loop-reduce -loop-reduce'
     print parameterList
 
     '''
     #.c to .ll
-    output = self.call_program('./clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
-    #print 'converting .c to .ll took ' + str(output['time']) + ' seconds'
+    output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
     if output['returncode'] != 0:
       print "error at .c to .ll step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     '''
 
     #.ll to .bc
-    output = self.call_program('./opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
-    #print 'converting .ll to .bc took ' + str(output['time']) + ' seconds'
+    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
     if output['returncode'] != 0:
       print "error at .ll to .bc step\n"
       print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.bc to .s
-    output = self.call_program('./llc ' + bc_int + ' -o ' + s_int, limit = timeout)
-    #print 'converting .bc to .s took ' + str(output['time']) + ' seconds'
+    output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
     if output['returncode'] != 0:
       print "error at .bc to .s step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.s to .o
     output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
-    #print 'converting .s to .o took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print "error at s to .o step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out
-    output = self.call_program('./clang -lstdc++ -lm ' + o_int + ' -o ' + out_int, limit = timeout)
-    #print 'converting .o to .out took ' + str(output['time']) + ' seconds'
+    output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int, limit = timeout)
     if output['returncode'] != 0:
       print "error at .o to .out\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
@@ -108,17 +123,19 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \" $tt\"', limit = timeout)
     #runtime is printed in ms, right after a space
     #runtime is the last to be printed, so we take output.split(' ')[-1]
-    if ('ERROR' in output['stdout']) or output['returncode'] != 0:
+    if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
       print 'error at running code\n'
       print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     else:
       runtime = float(output['stdout'].split(' ')[-1])
+      #print output['stdout'] + ' is stdout'
+      #print output['stderr'] + ' is stderr'
       print 'running the code took ' + str(runtime/1000) + ' seconds\n'
       return opentuner.resultsdb.models.Result(time=runtime/1000)
 
     '''
-    output = self.call_program('./clang -O2 -lm -lstdc++ ' + source_name + ' -o ' + 'test.out', limit = timeout)
+    output = self.call_program('clang -O2 -lm -lstdc++ ' + source_name + ' -o ' + 'test.out', limit = timeout)
     if output['returncode'] != 0:
       print "error at compilation"
       print output['stderr']
