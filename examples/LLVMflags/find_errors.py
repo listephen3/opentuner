@@ -16,19 +16,40 @@ out_int = source_file_name + '.out'
 
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
-#Analysis Passes that might be useful
+#Unnecessary passes
+'-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features',
+'-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
+'-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', 
+'-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args',
+'-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', '-print-memoryssa', '-print-module',
+'-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow',
+'-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only',
 
-#Transform passes that might be useful
+'-aa', '-aa-eval', '-alloca-hoisting', '-always-inline',  '-asan', '-asan-module', '-assumption-cache-tracker','-atomic-expand', '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa',  '-codegenprepare', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize',  '-dfsan',  '-divergence', '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-extract', '-loop-extract-single', '-loop-reroll', '-loop-reduce', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-metarenamer', '-module-debuginfo', '-msan',  '-nvvm-reflect', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use',  '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate', 
 
-#Analysis Passes that unnecessary
+#Used separately in the code below
+'-targetlibinfo', '-verify', 
 
-#Utility Passes that unnecessary
-
-#Transform passes that unnecessary
-
-#These passes don't have much documentation
-'-aa', '-aa-eval', '-add-discriminators', '-alignment-from-assumptions', '-alloca-hoisting', '-always-inline', '-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features', '-asan', '-asan-module', '-assumption-cache-tracker', '-atomic-expand', '-bb-vectorize',  '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa', '-codegenprepare', '-consthoist', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize', '-demanded-bits', '-dfsan', '-divergence', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-flattencfg', '-float2int', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-accesses', '-loop-data-prefetch', '-loop-distribute', '-loop-extract', '-loop-extract-single', '-loop-interchange', '-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-simplifycfg', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-mergereturn', '-metarenamer', '-mldst-motion', '-module-debuginfo', '-msan', '-nary-reassociate', '-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', '-print-memoryssa', '-print-module', '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scalarizer', '-scalarrepl-ssa', '-scev-aa', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-sink', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate'
-#Used separately in the code below'-targetlibinfo', '-verify', 
+#'-scev-aa',
+#'-add-discriminators',
+#'-alignment-from-assumptions', 
+#'-bb-vectorize',
+#'-consthoist',
+#'-demanded-bits',
+#'-flattencfg', 
+#'-float2int', 
+#'-loop-data-prefetch',
+#'-loop-accesses',
+#'-loop-interchange',
+#'-loop-load-elim',
+#'-loop-distribute',
+#'-loop-simplifycfg',
+#'-mergereturn',
+#'-mldst-motion', 
+#'-nary-reassociate',
+#'-scalarizer', 
+#'-scalarrepl-ssa', note: alternate with mem2reg
+#'-sink',
 ]
 
 args_list = [
@@ -58,6 +79,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
 
     print parameterList
 
+    '''
     #.ll to .bc
     output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = 5)
     if output['time'] == float('inf'):
@@ -65,6 +87,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     if output['returncode'] != 0:
       print "error at .ll to .bc step\n\n\n\n"
       return opentuner.resultsdb.models.Result(time=len(parameterList))
+      '''
 
     #.bc to .s
     output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
@@ -104,11 +127,11 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
     flagListDuplicate = []
-    for i in range(1):
+    for i in range(3):
       flagListDuplicate.extend(self.flagList)
 
     for f in self.flagList:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
     m.add_parameter(manipulator.PermutationParameter('order', flagListDuplicate))
     
     return m

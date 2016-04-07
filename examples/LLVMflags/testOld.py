@@ -193,3 +193,8 @@ if __name__ == '__main__':
   #call_program()
   LLVMFlagsTuner.main(args)
   
+#output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \" $tt\"', limit = timeout)
+    #runtime is printed in ms, right after a space
+    #runtime is the last to be printed, so we take output.split(' ')[-1]
+#runtime = float(output['stdout'].split(' ')[-1])
+#print 'running the code took ' + str(runtime/1000) + ' seconds\n'

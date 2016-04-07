@@ -6,7 +6,7 @@ import time
 from opentuner.search import manipulator
 
 timeout = 5 #seconds
-source_name = 'tsp_ga.cpp'
+source_name = 'raytracer.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
 bc_int = source_file_name + '.bc'
@@ -16,10 +16,6 @@ out_int = source_file_name + '.out'
 
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
-#Analysis Passes that might be useful
-
-#Transform passes that might be useful
-
 #Unnecessary passes
 '-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-amdgpu-annotate-kernel-features',
 '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only',
@@ -29,8 +25,7 @@ args_blacklist = [
 '-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow',
 '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only',
 
-'-aa', '-aa-eval', '-alloca-hoisting', '-always-inline',  '-asan', '-asan-module', '-assumption-cache-tracker',
-'-atomic-expand', '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa',  '-codegenprepare', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize',  '-dfsan',  '-divergence', '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-extract', '-loop-extract-single', '-loop-reroll', '-loop-reduce', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-metarenamer', '-module-debuginfo', '-msan',  '-nvvm-reflect', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use',  '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate', 
+'-aa', '-aa-eval', '-alloca-hoisting', '-always-inline',  '-asan', '-asan-module', '-assumption-cache-tracker','-atomic-expand', '-bool-ret-to-int', '-bounds', '-bounds-checking', '-break-crit-edges', '-cfl-aa',  '-codegenprepare', '-cost-model', '-cross-dso-cfi', '-deadarghaX0r', '-delinearize',  '-dfsan',  '-divergence', '-dwarfehprepare', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-forceattrs', '-function-import', '-generic-to-nvvm', '-globals-aa', '-inferattrs', '-insert-gcov-profiling', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-irce', '-iv-users', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-extract', '-loop-extract-single', '-loop-reroll', '-loop-reduce', '-loop-versioning', '-loop-versioning-licm', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-memoryssalazy', '-metarenamer', '-module-debuginfo', '-msan',  '-nvvm-reflect', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use',  '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-reg2mem', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-sjljehprepare', '-slotindexes', '-slsr', '-speculative-execution', '-strip', '-strip-dead-debug-info', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tsan', '-tti', '-unreachable-mbb-elimination', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate', 
 
 #Used separately in the code below
 '-targetlibinfo', '-verify', 
@@ -61,23 +56,29 @@ args_list = [
 '-aa', '-aa-eval', '-adce', '-add-discriminators', '-alignment-from-assumptions', '-alloca-hoisting', '-always-inline', '-amdgpu-annotate-kernel-features', '-amdgpu-annotate-uniform', '-amdgpu-promote-alloca', '-argpromotion', '-asan', '-asan-module', '-assumption-cache-tracker', '-atomic-expand', '-barrier', '-basicaa', '-basiccg', '-bb-vectorize', '-bdce', '-block-freq', '-bool-ret-to-int', '-bounds-checking', '-branch-prob', '-break-crit-edges', '-cfl-aa', '-codegenprepare', '-consthoist', '-constmerge', '-constprop', '-correlated-propagation', '-cost-model', '-cross-dso-cfi', '-da', '-dce', '-deadargelim', '-deadarghaX0r', '-delinearize', '-demanded-bits', '-dfsan', '-die', '-divergence', '-domfrontier', '-domtree', '-dot-callgraph', '-dot-cfg', '-dot-cfg-only', '-dot-dom', '-dot-dom-only', '-dot-postdom', '-dot-postdom-only', '-dot-regions', '-dot-regions-only', '-dse', '-dwarfehprepare', '-early-cse', '-elim-avail-extern', '-external-aa', '-extract-blocks', '-flattencfg', '-float2int', '-forceattrs', '-function-import', '-functionattrs', '-generic-to-nvvm', '-globaldce', '-globalopt', '-globals-aa', '-gvn', '-indvars', '-inferattrs', '-inline', '-insert-gcov-profiling', '-instcombine', '-instcount', '-instnamer', '-instrprof', '-instsimplify', '-internalize', '-intervals', '-ipconstprop', '-ipsccp', '-irce', '-iv-users', '-jump-threading', '-lazy-value-info', '-lcssa', '-licm', '-lint', '-liveintervals', '-livevars', '-load-combine', '-loop-accesses', '-loop-data-prefetch', '-loop-deletion', '-loop-distribute', '-loop-extract', '-loop-extract-single', '-loop-idiom', '-loop-instsimplify', '-loop-interchange', '-loop-load-elim', '-loop-reduce', '-loop-reroll', '-loop-rotate', '-loop-simplify', '-loop-simplifycfg', '-loop-unroll', '-loop-unswitch', '-loop-vectorize', '-loop-versioning', '-loop-versioning-licm', '-loops', '-lower-expect', '-loweratomic', '-lowerbitsets', '-lowerinvoke', '-lowerswitch', '-machinedomtree', '-machinepostdomtree', '-mem2reg', '-memcpyopt', '-memdep', '-memoryssalazy', '-mergefunc', '-mergereturn', '-metarenamer', '-mldst-motion', '-module-debuginfo', '-msan', '-nary-reassociate', '-nvptx-assign-valid-global-names', '-nvptx-favor-non-generic', '-nvptx-lower-aggr-copies', '-nvptx-lower-alloca', '-nvptx-lower-kernel-args', '-nvvm-reflect', '-objc-arc', '-objc-arc-aa', '-objc-arc-apelim', '-objc-arc-contract', '-objc-arc-expand', '-pa-eval', '-partial-inliner', '-partially-inline-libcalls', '-pgo-instr-gen', '-pgo-instr-use', '-place-backedge-safepoints-impl', '-place-safepoints', '-postdomtree', '-print-alias-sets', '-print-bb', '-print-callgraph', '-print-callgraph-sccs', '-print-cfg-sccs', '-print-dom-info', '-print-externalfnconstants', '-print-function', '-print-memdeps', '-print-memderefs', '-print-memoryssa', '-print-module', '-prune-eh', '-reassociate', '-reg2mem', '-regions', '-rewrite-statepoints-for-gc', '-rewrite-symbols', '-rpo-functionattrs', '-safe-stack', '-sample-profile', '-sancov', '-scalar-evolution', '-scalarizer', '-scalarrepl', '-scalarrepl-ssa', '-sccp', '-scev-aa', '-scoped-noalias', '-separate-const-offset-from-gep', '-sgpr-copies', '-si-annotate-control-flow', '-si-fix-cf-live-intervals', '-si-fix-sgpr-live-ranges', '-si-fold-operands', '-si-i1-copies', '-si-insert-nops', '-si-insert-waits', '-si-load-store-opt', '-si-lower-control-flow', '-simplifycfg', '-sink', '-sjljehprepare', '-slotindexes', '-slp-vectorizer', '-slsr', '-speculative-execution', '-sroa', '-strip', '-strip-dead-debug-info', '-strip-dead-prototypes', '-strip-debug-declare', '-strip-nondebug', '-structurizecfg', '-tailcallelim', '-targetlibinfo', '-tbaa', '-tsan', '-tti', '-unreachable-mbb-elimination', '-verify', '-view-callgraph', '-view-cfg', '-view-cfg-only', '-view-dom', '-view-dom-only', '-view-postdom', '-view-postdom-only', '-view-regions', '-view-regions-only', '-wholeprogramdevirt', '-winehprepare', '-x86-winehstate'
 ]
 
+extended_list = [
+'-addr-sink-using-gep', '-aggregate-extracted-args', '-aggressive-ext-opt', '-align-neon-spills', '-asm-show-inst', '-avoid-speculation', '-basicaa-recphi', '-bb-vectorize-aligned-only', '-bb-vectorize-fast-dep', '-bb-vectorize-ignore-target-info', '-bb-vectorize-splat-breaks-chain', '-bb-vectorize-use-chain-depth', '-bounds-checking-single-trap', '-branch-relax-asm-large', '-check-vmlx-hazard', '-combine-loads', '-combiner-alias-analysis', '-combiner-global-alias-analysis', '-combiner-split-load-index', '-combiner-stress-load-slicing', '-combiner-use-tbaa', '-commgep-const', '-commgep-inv', '-commgep-speculate', '-costmodel-reduxcost', '-da-delinearize', '-data-sections', '-dfsan-args-abi', '-dfsan-combine-pointer-labels-on-load', '-dfsan-combine-pointer-labels-on-store', '-dfsan-preserve-alignment', '-early-live-intervals', '-emulated-tls', '-enable-aa-sched-mi', '-enable-acc-forwarding', '-enable-alu-forwarding', '-enable-andcmp-sinking', '-enable-block-placement-stats', '-enable-bsb-sched', '-enable-cond-stores-vec', '-enable-deferred-spilling', '-enable-fmf-dag', '-enable-fp-mad', '-enable-gen-insn', '-enable-global-merge', '-enable-hexagon-br-prob', '-enable-hexagon-hvx', '-enable-hexagon-hvx-double', '-enable-hexagon-ieee-rnd-near', '-enable-hexagon-memops', '-enable-hexagon-sdnode-sched', '-enable-if-conversion', '-enable-implicit-null-checks', '-enable-ind-var-reg-heur', '-enable-interleaved-mem-accesses', '-enable-legalize-types-checking', '-enable-load-pre', '-enable-loadstore-runtime-interleave', '-enable-local-reassign', '-enable-loop-distribute', '-enable-loop-load-elim', '-enable-loop-versioning-licm', '-enable-loopinterchange', '-enable-lsr-phielim', '-enable-mem-access-versioning', '-enable-mips-tail-calls', '-enable-misched', '-enable-name-compression', '-enable-noalias-to-md-conversion', '-enable-non-lto-gmr', '-enable-objc-arc-opts', '-enable-patchpoint-liveness', '-enable-pie', '-enable-post-misched', '-enable-ppc-extra-toc-reg-deps', '-enable-ppc-prefetching', '-enable-pre', '-enable-scoped-noalias', '-enable-selectiondag-sp', '-enable-shrink-wrap', '-enable-sign-dependent-rounding-fp-math', '-enable-subreg-liveness', '-enable-tail-merge', '-enable-tbaa', '-enable-timing-class-latency', '-enable-unsafe-globalsmodref-alias-results', '-exhaustive-register-search', '-expand-all-fp-mlx', '-expensive-combines', '-expose-ppc-andi-glue-bug', '-extra-vectorizer-passes', '-extract-needand', '-extract-nosr0', '-fast-isel', '-ffast-math', '-fixup-byte-word-insts', '-float-to-int', '-force-mips-long-branch', '-function-sections', '-funit-at-a-time', '-gcov-exit-block-before-body', '-global-isel', '-global-merge-group-by-use', '-global-merge-ignore-single-use', '-global-merge-on-const', '-global-merge-on-external', '-group-functions-by-hotness', '-hexagon-align-calls', '-hexagon-bit', '-hexagon-commgep', '-hexagon-eif', '-hexagon-emit-jump-tables', '-hexagon-enable-branch-prediction', '-hexagon-expand-condsets', '-hexagon-extract', '-hexagon-gen-pred', '-hexagon-hwloop-preheader', '-hexagon-insert', '-hexagon-loop-resched', '-hexagon-mux', '-hexagon-opt-spill', '-hexagon-packetize-volatiles', '-hexagon-sched-inline-asm', '-hexagon-shrink-frame', '-hoist-cheap-insts', '-hsdr-no-mem', '-ifcvt-branch-fold', '-incremental-linker-compatible', '-insert-all0', '-insert-const', '-insert-has0', '-insert-timing', '-insert-timing-detail', '-join-globalcopies', '-join-liveintervals', '-join-splitedges', '-jump-is-expensive', '-liv-reduce', '-loop-distribute-non-if-convertible', '-loop-distribute-verify', '-loop-prefetch-writes', '-loop-unswitch-with-block-frequency', '-loop-vectorize-with-block-frequency', '-lower-interleaved-accesses', '-lowerbitsets-avoid-reuse', '-machine-sink-bfi', '-machine-sink-split', '-mark-data-regions', '-mc-relax-all', '-mextern-sdata', '-mgpopt', '-mips-align-constant-islands', '-mips-constant-islands-no-load-relaxation', '-mips-erase-gp-opnd', '-mips-fix-global-base-reg', '-mips-load-target-from-got', '-mips-os16', '-mips16-constant-islands', '-mips16-dont-expand-cond-pseudo', '-mips16-hard-float', '-misched-bottomup', '-misched-cluster', '-misched-cyclicpath', '-misched-fusion', '-misched-postra', '-misched-regpressure', '-misched-topdown', '-mlocal-sdata', '-mlsm', '-mno-check-zero-division', '-mno-compound', '-mno-ldc1-sdc1', '-mno-pairing', '-msan-check-access-address', '-msan-check-constant-shadow', '-msan-handle-icmp', '-msan-handle-icmp-exact', '-msan-keep-going', '-msan-poison-stack', '-msan-poison-stack-with-call', '-msan-poison-undef', '-mxgot', '-no-discriminators', '-no-phi-elim-live-out-early-exit', '-no-stack-coloring', '-no-stack-slot-sharing', '-no-x86-call-frame-opt', '-nozero-initialized-in-bss', '-nvvm-reflect-enable', '-old-thumb2-ifcvt', '-only-simple-regions', '-optimize-regalloc', '-outline-optional-branches', '-pbqp-coalescing', '-phi-elim-split-all-critical-edges', '-post-RA-scheduler', '-ppc-always-use-base-pointer', '-ppc-bit-perm-rewriter-stress-rotates', '-ppc-gep-opt', '-ppc-machine-combiner', '-ppc-track-subreg-liveness', '-ppc-use-base-pointer', '-ppc-use-bit-perm-rewriter', '-ppc-use-branch-hint', '-precise-rotation-cost', '-preserve-alignment-assumptions-during-inlining', '-preserve-bc-uselistorder', '-preserve-ll-uselistorder', '-protect-from-escaped-allocas', '-qpx-stack-unaligned', '-quiet', '-rdf-dump', '-rdf-opt', '-relax-nv-checks', '-remat-pic-stub-load', '-reroll-loops', '-rs4gc-allow-statepoint-with-no-deopt-info', '-rs4gc-clobber-non-live', '-run-slp-after-loop-vectorization', '-run-twice', '-scalarize-load-store', '-scheditins', '-schedmodel', '-schedule-ppc-vsx-fma-mutation-early', '-simplifycfg-dup-ret', '-simplifycfg-hoist-cond-stores', '-simplifycfg-merge-cond-stores', '-simplifycfg-merge-cond-stores-aggressively', '-simplifycfg-sink-common', '-sink-insts-to-avoid-spills', '-skip-mips-long-branch', '-slp-vectorize-hor', '-slp-vectorize-hor-store', '-sparc-reserve-app-registers', '-speculate-one-expensive-inst', '-spp-all-backedges', '-spp-no-backedge', '-spp-no-call', '-spp-no-entry', '-spp-split-backedge', '-sroa-random-shuffle-slices', '-sroa-strict-inbounds', '-stack-symbol-ordering', '-stackrealign', '-std-link-opts', '-stress-cgp-ext-ld-promotion', '-stress-cgp-store-extract', '-stress-early-ifcvt', '-tail-dup-verify', '-tailcallopt', '-terminal-rule', '-track-memory', '-tsan-instrument-atomics', '-tsan-instrument-func-entry-exit', '-tsan-instrument-memintrinsics', '-tsan-instrument-memory-accesses', '-twoaddr-reschedule', '-unique-section-names', '-unroll-allow-partial', '-unroll-runtime', '-use-allocframe', '-use-cfl-aa', '-use-cfl-aa-in-codegen', '-use-ctors', '-use-gvn-after-vectorization', '-use-mbpi', '-use-new-sroa', '-use-segment-set-for-physregs', '-use-tbaa-in-sched-mi', '-vectorize-loops', '-vectorize-slp', '-vectorize-slp-aggressive', '-vectorizer-maximize-bandwidth', '-widen-vmovs', '-x86-early-ifcvt', '-x86-experimental-vector-widening-legalization', '-x86-machine-combiner', '-x86-use-base-pointer', '-x86-use-vzeroupper'
+]
 
 class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def __init__(self, *pargs, **kwargs):
       super(LLVMFlagsTuner, self).__init__(*pargs, **kwargs)
-      self.flagList = self.getArgs()
+      self.flag_list = self.getArgs()
+      self.extended_flag_list = extended_list
 
   def run(self, desired_result, input, limit):
-    #pass'
     cfg = desired_result.configuration.data
     counter = {}
     parameterList = '-targetlibinfo '
-    for i in self.flagList:
+    for i in self.flag_list:
+      counter[i] = 0
+    for i in self.extended_flag_list:
       counter[i] = 0
 
     #we're iterating through the duplicate of flags here
     #and if it's appeared less than the specified # of times, we
     #add it to the parameter List
+
     for i in cfg['order']:
       if counter[i] < cfg[i]:
         parameterList += i + ' '
@@ -120,45 +121,28 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     argument = './' + out_int
-    output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \" $tt\"', limit = timeout)
-    #runtime is printed in ms, right after a space
-    #runtime is the last to be printed, so we take output.split(' ')[-1]
+    output = self.call_program('./' + out_int, limit = timeout)
     if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
       print 'error at running code\n'
       print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     else:
-      runtime = float(output['stdout'].split(' ')[-1])
-      #print output['stdout'] + ' is stdout'
-      #print output['stderr'] + ' is stderr'
-      print 'running the code took ' + str(runtime/1000) + ' seconds\n'
-      return opentuner.resultsdb.models.Result(time=runtime/1000)
-
-    '''
-    output = self.call_program('clang -O2 -lm -lstdc++ ' + source_name + ' -o ' + 'test.out', limit = timeout)
-    if output['returncode'] != 0:
-      print "error at compilation"
-      print output['stderr']
-    '''
-    '''
-    argument = './test.out'
-    output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \"$tt\"', limit = timeout)
-    print 'running the code took ' + str(float(output['stdout'])/1000) + ' seconds\n'
-    return opentuner.resultsdb.models.Result(time=float(output['stdout'])/1000)
-    '''
-
-
+      print 'running the code took ' + str(output['time']) + ' seconds\n'
+      return opentuner.resultsdb.models.Result(time=output['time'])
 
 
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
-    flagListDuplicate = []
+    flag_list_duplicate = []
     for i in range(3):
-      flagListDuplicate.extend(self.flagList)
+      flag_list_duplicate.extend(self.flag_list)
+      flag_list_duplicate.extend(self.extended_flag_list)
 
-    for f in self.flagList:
+    for f in self.flag_list:
       m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
-    m.add_parameter(manipulator.PermutationParameter('order', flagListDuplicate))
+    for f in self.extended_flag_list:
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+    m.add_parameter(manipulator.PermutationParameter('order', flag_list_duplicate))
     
     return m
 
