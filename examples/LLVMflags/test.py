@@ -60,19 +60,27 @@ extended_list = [
 '-addr-sink-using-gep', '-aggregate-extracted-args', '-aggressive-ext-opt', '-align-neon-spills', '-asm-show-inst', '-avoid-speculation', '-basicaa-recphi', '-bb-vectorize-aligned-only', '-bb-vectorize-fast-dep', '-bb-vectorize-ignore-target-info', '-bb-vectorize-splat-breaks-chain', '-bb-vectorize-use-chain-depth', '-bounds-checking-single-trap', '-branch-relax-asm-large', '-check-vmlx-hazard', '-combine-loads', '-combiner-alias-analysis', '-combiner-global-alias-analysis', '-combiner-split-load-index', '-combiner-stress-load-slicing', '-combiner-use-tbaa', '-commgep-const', '-commgep-inv', '-commgep-speculate', '-costmodel-reduxcost', '-da-delinearize', '-data-sections', '-dfsan-args-abi', '-dfsan-combine-pointer-labels-on-load', '-dfsan-combine-pointer-labels-on-store', '-dfsan-preserve-alignment', '-early-live-intervals', '-emulated-tls', '-enable-aa-sched-mi', '-enable-acc-forwarding', '-enable-alu-forwarding', '-enable-andcmp-sinking', '-enable-block-placement-stats', '-enable-bsb-sched', '-enable-cond-stores-vec', '-enable-deferred-spilling', '-enable-fmf-dag', '-enable-fp-mad', '-enable-gen-insn', '-enable-global-merge', '-enable-hexagon-br-prob', '-enable-hexagon-hvx', '-enable-hexagon-hvx-double', '-enable-hexagon-ieee-rnd-near', '-enable-hexagon-memops', '-enable-hexagon-sdnode-sched', '-enable-if-conversion', '-enable-implicit-null-checks', '-enable-ind-var-reg-heur', '-enable-interleaved-mem-accesses', '-enable-legalize-types-checking', '-enable-load-pre', '-enable-loadstore-runtime-interleave', '-enable-local-reassign', '-enable-loop-distribute', '-enable-loop-load-elim', '-enable-loop-versioning-licm', '-enable-loopinterchange', '-enable-lsr-phielim', '-enable-mem-access-versioning', '-enable-mips-tail-calls', '-enable-misched', '-enable-name-compression', '-enable-noalias-to-md-conversion', '-enable-non-lto-gmr', '-enable-objc-arc-opts', '-enable-patchpoint-liveness', '-enable-pie', '-enable-post-misched', '-enable-ppc-extra-toc-reg-deps', '-enable-ppc-prefetching', '-enable-pre', '-enable-scoped-noalias', '-enable-selectiondag-sp', '-enable-shrink-wrap', '-enable-sign-dependent-rounding-fp-math', '-enable-subreg-liveness', '-enable-tail-merge', '-enable-tbaa', '-enable-timing-class-latency', '-enable-unsafe-globalsmodref-alias-results', '-exhaustive-register-search', '-expand-all-fp-mlx', '-expensive-combines', '-expose-ppc-andi-glue-bug', '-extra-vectorizer-passes', '-extract-needand', '-extract-nosr0', '-fast-isel', '-ffast-math', '-fixup-byte-word-insts', '-float-to-int', '-force-mips-long-branch', '-function-sections', '-funit-at-a-time', '-gcov-exit-block-before-body', '-global-isel', '-global-merge-group-by-use', '-global-merge-ignore-single-use', '-global-merge-on-const', '-global-merge-on-external', '-group-functions-by-hotness', '-hexagon-align-calls', '-hexagon-bit', '-hexagon-commgep', '-hexagon-eif', '-hexagon-emit-jump-tables', '-hexagon-enable-branch-prediction', '-hexagon-expand-condsets', '-hexagon-extract', '-hexagon-gen-pred', '-hexagon-hwloop-preheader', '-hexagon-insert', '-hexagon-loop-resched', '-hexagon-mux', '-hexagon-opt-spill', '-hexagon-packetize-volatiles', '-hexagon-sched-inline-asm', '-hexagon-shrink-frame', '-hoist-cheap-insts', '-hsdr-no-mem', '-ifcvt-branch-fold', '-incremental-linker-compatible', '-insert-all0', '-insert-const', '-insert-has0', '-insert-timing', '-insert-timing-detail', '-join-globalcopies', '-join-liveintervals', '-join-splitedges', '-jump-is-expensive', '-liv-reduce', '-loop-distribute-non-if-convertible', '-loop-distribute-verify', '-loop-prefetch-writes', '-loop-unswitch-with-block-frequency', '-loop-vectorize-with-block-frequency', '-lower-interleaved-accesses', '-lowerbitsets-avoid-reuse', '-machine-sink-bfi', '-machine-sink-split', '-mark-data-regions', '-mc-relax-all', '-mextern-sdata', '-mgpopt', '-mips-align-constant-islands', '-mips-constant-islands-no-load-relaxation', '-mips-erase-gp-opnd', '-mips-fix-global-base-reg', '-mips-load-target-from-got', '-mips-os16', '-mips16-constant-islands', '-mips16-dont-expand-cond-pseudo', '-mips16-hard-float', '-misched-bottomup', '-misched-cluster', '-misched-cyclicpath', '-misched-fusion', '-misched-postra', '-misched-regpressure', '-misched-topdown', '-mlocal-sdata', '-mlsm', '-mno-check-zero-division', '-mno-compound', '-mno-ldc1-sdc1', '-mno-pairing', '-msan-check-access-address', '-msan-check-constant-shadow', '-msan-handle-icmp', '-msan-handle-icmp-exact', '-msan-keep-going', '-msan-poison-stack', '-msan-poison-stack-with-call', '-msan-poison-undef', '-mxgot', '-no-discriminators', '-no-phi-elim-live-out-early-exit', '-no-stack-coloring', '-no-stack-slot-sharing', '-no-x86-call-frame-opt', '-nozero-initialized-in-bss', '-nvvm-reflect-enable', '-old-thumb2-ifcvt', '-only-simple-regions', '-optimize-regalloc', '-outline-optional-branches', '-pbqp-coalescing', '-phi-elim-split-all-critical-edges', '-post-RA-scheduler', '-ppc-always-use-base-pointer', '-ppc-bit-perm-rewriter-stress-rotates', '-ppc-gep-opt', '-ppc-machine-combiner', '-ppc-track-subreg-liveness', '-ppc-use-base-pointer', '-ppc-use-bit-perm-rewriter', '-ppc-use-branch-hint', '-precise-rotation-cost', '-preserve-alignment-assumptions-during-inlining', '-preserve-bc-uselistorder', '-preserve-ll-uselistorder', '-protect-from-escaped-allocas', '-qpx-stack-unaligned', '-quiet', '-rdf-dump', '-rdf-opt', '-relax-nv-checks', '-remat-pic-stub-load', '-reroll-loops', '-rs4gc-allow-statepoint-with-no-deopt-info', '-rs4gc-clobber-non-live', '-run-slp-after-loop-vectorization', '-run-twice', '-scalarize-load-store', '-scheditins', '-schedmodel', '-schedule-ppc-vsx-fma-mutation-early', '-simplifycfg-dup-ret', '-simplifycfg-hoist-cond-stores', '-simplifycfg-merge-cond-stores', '-simplifycfg-merge-cond-stores-aggressively', '-simplifycfg-sink-common', '-sink-insts-to-avoid-spills', '-skip-mips-long-branch', '-slp-vectorize-hor', '-slp-vectorize-hor-store', '-sparc-reserve-app-registers', '-speculate-one-expensive-inst', '-spp-all-backedges', '-spp-no-backedge', '-spp-no-call', '-spp-no-entry', '-spp-split-backedge', '-sroa-random-shuffle-slices', '-sroa-strict-inbounds', '-stack-symbol-ordering', '-stackrealign', '-std-link-opts', '-stress-cgp-ext-ld-promotion', '-stress-cgp-store-extract', '-stress-early-ifcvt', '-tail-dup-verify', '-tailcallopt', '-terminal-rule', '-track-memory', '-tsan-instrument-atomics', '-tsan-instrument-func-entry-exit', '-tsan-instrument-memintrinsics', '-tsan-instrument-memory-accesses', '-twoaddr-reschedule', '-unique-section-names', '-unroll-allow-partial', '-unroll-runtime', '-use-allocframe', '-use-cfl-aa', '-use-cfl-aa-in-codegen', '-use-ctors', '-use-gvn-after-vectorization', '-use-mbpi', '-use-new-sroa', '-use-segment-set-for-physregs', '-use-tbaa-in-sched-mi', '-vectorize-loops', '-vectorize-slp', '-vectorize-slp-aggressive', '-vectorizer-maximize-bandwidth', '-widen-vmovs', '-x86-early-ifcvt', '-x86-experimental-vector-widening-legalization', '-x86-machine-combiner', '-x86-use-base-pointer', '-x86-use-vzeroupper'
 ]
 
+int_list = [
+'-align-all-blocks', '-align-all-functions', '-align-all-nofallthru-blocks', '-available-load-scan-limit', '-bb-vectorize-max-cycle-check-pairs', '-bb-vectorize-max-instr-per-group', '-bb-vectorize-max-iter', '-bb-vectorize-max-pairs-per-group', '-bb-vectorize-req-chain-depth', '-bb-vectorize-search-limit', '-bb-vectorize-vector-bits', '-block-placement-exit-block-bias', '-bonus-inst-threshold', '-dag-maps-huge-region', '-dag-maps-reduction-size', '-dom-conditions-max-uses', '-early-ifcvt-limit', '-eif-limit', '-expand-condsets-coa-limit', '-expand-condsets-tfr-limit', '-expand-limit', '-extract-cutoff', '-float2int-max-integer-bw', '-force-target-instruction-cost', '-force-target-max-scalar-interleave', '-force-target-max-vector-interleave', '-force-target-num-scalar-regs', '-force-target-num-vector-regs', '-force-vector-interleave', '-force-vector-width', '-ga-max-num-uses-for-constant-extenders', '-gpsize', '-icp-max-annotations', '-insert-dist-cutoff', '-insert-vreg-cutoff', '-jump-inst-cost', '-jump-threading-implication-search-threshold', '-jump-threading-threshold', '-lcr-max-depth', '-lcr-max-interf', '-licm-versioning-max-depth-threshold', '-likely-branch-weight', '-loop-distribute-scev-check-threshold', '-loop-load-elimination-scev-check-threshold', '-loop-to-cold-block-ratio', '-loop-unswitch-coldness-threshold', '-loop-unswitch-threshold', '-max-dependences', '-max-interleave-group-factor', '-max-nested-scalar-reduction-interleave', '-max-num-inst-between-tfr-and-nv-store', '-max-recurse-depth', '-max-reroll-increment', '-max-speculation-depth', '-memdep-block-number-limit', '-memdep-block-scan-limit', '-memory-check-merge-threshold', '-mips-ssection-threshold', '-misfetch-cost', '-outline-optional-threshold', '-partial-unrolling-threshold', '-phi-node-folding-threshold', '-ppc-loop-prefetch-cache-line', '-ppc-loop-prefetch-distance', '-ppc-preinc-prep-max-vars', '-pragma-unroll-threshold', '-pragma-vectorize-memory-check-threshold', '-pragma-vectorize-scev-check-threshold', '-rdf-limit', '-regalloc-csr-first-time-cost', '-reroll-num-tolerated-failed-matches', '-rewrite-phi-limit', '-rotation-max-header-size', '-runtime-check-per-loop-load-elim', '-runtime-memory-check-threshold', '-sched-avg-ipc', '-shrink-frame-limit', '-small-loop-cost', '-spec-exec-max-not-hoisted', '-spec-exec-max-speculation-cost', '-spp-rematerialization-threshold', '-stack-alignment', '-swift-partial-update-clearance', '-tail-dup-limit', '-tail-dup-size', '-tail-merge-size', '-tail-merge-threshold', '-unlikely-branch-weight', '-unroll-count', '-unroll-dynamic-cost-savings-discount', '-unroll-max-iteration-count-to-analyze', '-unroll-percent-dynamic-cost-saved-threshold', '-unroll-threshold', '-vectorize-num-stores-pred', '-vectorize-scev-check-threshold', '-vectorizer-min-trip-count', '-warn-stack-size', '-dfa-sched-reg-pressure-threshold', '-dwarf-version', '-hexagon-small-data-threshold', '-ifcvt-fn-start', '-ifcvt-fn-stop', '-ifcvt-limit', '-imp-null-check-page-size', '-inline-threshold', '-inlinecold-threshold', '-inlinehint-threshold', '-max-hsdr', '-max-sched-reorder', '-max-store-memcpy', '-max-store-memcpy-Os', '-max-store-memmove', '-max-store-memmove-Os', '-max-store-memset', '-max-store-memset-Os', '-minimum-jump-tables', '-mips-constant-islands-small-offset', '-msan-instrumentation-with-call-threshold', '-msan-poison-stack-pattern', '-msan-track-origins', '-number-scavenger-slots', '-nvj-count', '-sched-high-latency-cycles', '-slp-max-reg-size', '-slp-schedule-budget', '-slp-threshold', '-spp-counted-loop-trip-width', '-ssc-dce-limit', '-stackmap-version', '-t2-reduce-limit', '-t2-reduce-limit2', '-t2-reduce-limit3'
+]
+
+#enum_list is extracted in text
+
+
+
 class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
   def __init__(self, *pargs, **kwargs):
       super(LLVMFlagsTuner, self).__init__(*pargs, **kwargs)
       self.flag_list = self.getArgs()
       self.extended_flag_list = extended_list
+      self.int_list = int_list
+      self.enum_list = []
 
   def run(self, desired_result, input, limit):
     cfg = desired_result.configuration.data
     counter = {}
     parameterList = '-targetlibinfo '
-    for i in self.flag_list:
-      counter[i] = 0
-    for i in self.extended_flag_list:
+    for i in self.flag_list + self.extended_flag_list + self.int_list + self.enum_list:
       counter[i] = 0
 
     #we're iterating through the duplicate of flags here
@@ -81,7 +89,12 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
 
     for i in cfg['order']:
       if counter[i] < cfg[i]:
-        parameterList += i + ' '
+        if i in self.int_list:
+          parameterList += i + '=' + str(cfg[i + 'val']) + ' '
+        elif i in self.enum_list:
+          parameterList += i + cfg[i + 'enum'] + ' '
+        else: #flag does not have any tunable parameters
+          parameterList += i + ' '
       counter[i] += 1
 
     parameterList += '-verify'
@@ -132,19 +145,42 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
 
 
   def manipulator(self):
+    def enum_extractor(self):
+      f = open('enums.txt', 'r')
+      currentEntry = None
+      for i in f:
+        if '=' in i:
+          enum_dict[currentEntry].append(i.lstrip(' ').split(' ')[0])
+        else:
+          currentEntry = i.lstrip(' ').split(' ')[0]
+          enum_dict[currentEntry] = []
+          self.enum_list.append(currentEntry)
+
     m = manipulator.ConfigurationManipulator()
     flag_list_duplicate = []
+    enum_dict = {}
+    enum_extractor(self)
     for i in range(3):
       flag_list_duplicate.extend(self.flag_list)
       flag_list_duplicate.extend(self.extended_flag_list)
+      flag_list_duplicate.extend(self.int_list)
+      flag_list_duplicate.extend(self.enum_list)
 
     for f in self.flag_list:
       m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
     for f in self.extended_flag_list:
       m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+    for f in self.int_list:
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.IntegerParameter(f + 'val', 1, 1024))
+    for f in self.enum_list:
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.EnumParameter(f + 'enum', enum_dict[f]))
     m.add_parameter(manipulator.PermutationParameter('order', flag_list_duplicate))
     
     return m
+
+
 
   def getArgs(self):
     """

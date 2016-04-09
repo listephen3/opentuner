@@ -1,0 +1,62 @@
+  -asm-instrumentation                                           - Instrumentation of inline assembly and assembly source files
+    =none                                                        -   no instrumentation at all
+    =address                                                     -   instrument instructions with memory arguments
+  -dwarf-linkage-names                                           - Emit DWARF linkage-name attributes.
+    =Default                                                     -   Default for platform
+    =Enable                                                      -   Enabled
+    =Disable                                                     -   Disabled
+  -float-abi                                                     - Choose float ABI type
+    =default                                                     -   Target default float ABI type
+    =soft                                                        -   Soft float ABI (implied by -soft-float)
+    =hard                                                        -   Hard float ABI (uses FP registers)
+  -fp-contract                                                   - Enable aggressive formation of fused FP ops
+    =fast                                                        -   Fuse FP ops whenever profitable
+    =on                                                          -   Only fuse 'blessed' FP ops.
+    =off                                                         -   Only fuse FP ops when the result won't be affected.
+  -jump-table-type                                               - Choose the type of Jump-Instruction Table for jumptable.
+    =single                                                      -   Create a single table for all jumptable functions
+    =arity                                                       -   Create one table per number of parameters.
+    =simplified                                                  -   Create one table per simplified function type.
+    =full                                                        -   Create one table per unique function type.
+  -misched                                                       - Machine instruction scheduler to use
+    =hexagon                                                     -   Run Hexagon's custom scheduler
+    =si                                                          -   Run SI's custom scheduler
+    =r600                                                        -   Run R600's custom scheduler
+    =default                                                     -   Use the target's default scheduler choice.
+    =converge                                                    -   Standard converging scheduler.
+    =ilpmax                                                      -   Schedule bottom-up for max ILP
+    =ilpmin                                                      -   Schedule bottom-up for min ILP
+  -pre-RA-sched                                                  - Instruction schedulers available (before register allocation):
+    =default                                                     -   Best scheduler for the target
+    =list-burr                                                   -   Bottom-up register reduction list scheduling
+    =source                                                      -   Similar to list-burr but schedules in source order when possible
+    =list-hybrid                                                 -   Bottom-up register pressure aware list scheduling which tries to balance latency and register pressure
+    =list-ilp                                                    -   Bottom-up register pressure aware list scheduling which tries to balance ILP and register pressure
+    =vliw-td                                                     -   VLIW scheduler
+  -regalloc                                                      - Register allocator to use
+    =default                                                     -   pick register allocator based on -O option
+    =fast                                                        -   fast register allocator
+    =greedy                                                      -   greedy register allocator
+    =pbqp                                                        -   PBQP register allocator
+  -relocation-model                                              - Choose relocation model
+    =default                                                     -   Target default relocation model
+    =static                                                      -   Non-relocatable code
+    =pic                                                         -   Fully relocatable, position independent code
+    =dynamic-no-pic                                              -   Relocatable external references, non-relocatable code
+  -replexitval                                                   - Choose the strategy to replace exit value in IndVarSimplify
+    =never                                                       -   never replace exit value
+    =cheap                                                       -   only replace exit value when the cost is cheap
+    =always                                                      -   always replace exit value whenever possible
+  -safe-stack-usp-storage                                        - Type of storage for the unsafe stack pointer
+    =thread-local                                                -   Thread-local storage
+    =single-thread                                               -   Non-thread-local storage
+  -split-spill-mode                                              - Spill mode for splitting live ranges
+    =default                                                     -   Default
+    =size                                                        -   Optimize for size
+    =speed                                                       -   Optimize for speed
+  -thread-model                                                  - Choose threading model
+    =posix                                                       -   POSIX thread model
+    =single                                                      -   Single thread model
+  -vector-library                                                - Vector functions library
+    =none                                                        -   No vector functions library
+    =Accelerate                                                  -   Accelerate framework
