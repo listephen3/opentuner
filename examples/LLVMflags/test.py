@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#for LLVM v3.9
 import opentuner
 import argparse
 import sys
@@ -13,6 +14,7 @@ bc_int = source_file_name + '.bc'
 s_int = source_file_name + '.s'
 o_int = source_file_name + '.o'
 out_int = source_file_name + '.out'
+first_run = True
 
 parser = argparse.ArgumentParser(parents=opentuner.argparsers())
 args_blacklist = [
@@ -74,39 +76,60 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       self.flag_list = self.getArgs()
       self.extended_flag_list = extended_list
       self.int_list = int_list
-      self.enum_list = []
+      self.enum_list = [] #will be filled in by reading from enums.txt
 
   def run(self, desired_result, input, limit):
     cfg = desired_result.configuration.data
-    counter = {}
+
+    global first_run
+    if first_run:
+        print 'First benchmarking clang -O2'
+        O2_times = []
+        output = self.call_program('clang -O2 -lm -lstdc++ ' + source_name + ' -o ' + 'clangO2.out', limit = timeout)
+        if output['returncode'] != 0:
+            print 'error at clang -O2 compilation\n'
+            print output['stderr']
+
+        for i in range(50):
+            output = self.call_program('./clangO2.out', limit = timeout)
+            if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
+                print 'error at running clang -O2 code\n'
+                print output['stderr']
+            O2_times.append(output['time'])
+        O2_times.sort()
+        print O2_times
+        print "Fast runtime for clang -O2 is " + str(O2_times[4]) + '\n\n\n\n'
+
+        print 'Now running OpenTuner'
+        #Converting .c to .ll, this step only needs to be done once
+        output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
+        if output['returncode'] != 0:
+          print "error at .c to .ll step\n"
+          return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+        first_run = False
+
     parameterList = '-targetlibinfo '
-    for i in self.flag_list + self.extended_flag_list + self.int_list + self.enum_list:
+    counter = {}
+    
+    for i in self.flag_list:
       counter[i] = 0
+    for i in self.extended_flag_list:
+      if cfg[i]:
+        parameterList += i + ' '
+    for i in self.int_list:
+      if cfg[i]:
+        parameterList += i + '=' + str(cfg[i + 'val']) + ' '
+    for i in self.enum_list:
+      if cfg[i]:
+        parameterList += i + cfg[i + 'enum'] + ' '
 
-    #we're iterating through the duplicate of flags here
-    #and if it's appeared less than the specified # of times, we
-    #add it to the parameter List
-
-    for i in cfg['order']:
+    for i in cfg['order']: #the passes are added last to the parameterList. They are added only counter[i] num times
       if counter[i] < cfg[i]:
-        if i in self.int_list:
-          parameterList += i + '=' + str(cfg[i + 'val']) + ' '
-        elif i in self.enum_list:
-          parameterList += i + cfg[i + 'enum'] + ' '
-        else: #flag does not have any tunable parameters
           parameterList += i + ' '
       counter[i] += 1
 
     parameterList += '-verify'
     print parameterList
-
-    '''
-    #.c to .ll
-    output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
-    if output['returncode'] != 0:
-      print "error at .c to .ll step\n"
-      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
-    '''
 
     #.ll to .bc
     output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
@@ -160,29 +183,27 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     flag_list_duplicate = []
     enum_dict = {}
     enum_extractor(self)
-    for i in range(3):
+    for i in range(3): #each pass is duplicated three times, and then randomly permutated
       flag_list_duplicate.extend(self.flag_list)
-      flag_list_duplicate.extend(self.extended_flag_list)
-      flag_list_duplicate.extend(self.int_list)
-      flag_list_duplicate.extend(self.enum_list)
 
     for f in self.flag_list:
       m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
     for f in self.extended_flag_list:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.BooleanParameter(f))
     for f in self.int_list:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.BooleanParameter(f))
       m.add_parameter(manipulator.IntegerParameter(f + 'val', 1, 1024))
     for f in self.enum_list:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 1))
+      m.add_parameter(manipulator.BooleanParameter(f))
       m.add_parameter(manipulator.EnumParameter(f + 'enum', enum_dict[f]))
     m.add_parameter(manipulator.PermutationParameter('order', flag_list_duplicate))
     
     return m
 
 
-
   def getArgs(self):
+    #this is normally how we extract the list of passes from LLVM, but we use our own pre-defined list
+    #to save time and help with debugging
     """
     output = self.call_program('opt --help')['stdout']
     output = output.split("\n")
@@ -205,9 +226,7 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       if i in args_list:
         args_list.remove(i)
     return args_list
-    
 
-      
 if __name__ == '__main__':
   opentuner.init_logging()
   args = parser.parse_args()

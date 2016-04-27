@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#for LLVM v3.4
 import opentuner
 import argparse
 import sys

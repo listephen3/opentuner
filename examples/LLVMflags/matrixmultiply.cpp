@@ -50,7 +50,7 @@ void SeqMatrixMult3(int size, T** __restrict__ m1, T** __restrict__ m2,
 
 
 template<typename T>
-void test() {
+double test() {
   T** a = make_test_matrix<T>();
   T** b = make_test_matrix<T>();
   T** c = make_test_matrix<T>();
@@ -63,13 +63,18 @@ void test() {
           avg += c[i][j] / (T)(N*N);
       }
   }
-  // print out average so caller can check answer
-  std::cout << avg << std::endl;
+  return avg;
 }
 
 
 int main(int argc, const char** argv) {
-  test<float>();
+  double returnval = test<float>();
+  if (abs(returnval - 2.91204e+12) > 1e+8){
+    std::cerr << abs(returnval - 2.91204e+12) << "\n";
+    std::cerr << "Value is " << returnval << "\n";
+    std::cerr << "Error, returned wrong value";
+    return 1;
+  }
   return 0;
 }
 
