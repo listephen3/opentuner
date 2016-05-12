@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
   if(dont_optimize_me == 0x4bd7c0e0) {
     //printf("CORRECT\n");
   } else {
-    printf("ERROR: WRONG ANSWER\n");
+    std::cerr << "ERROR: WRONG ANSWER\n";
   }
 
 	while (!spheres.empty()) {

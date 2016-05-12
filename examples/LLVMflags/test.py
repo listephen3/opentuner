@@ -7,7 +7,7 @@ import time
 from opentuner.search import manipulator
 
 timeout = 5 #seconds
-source_name = 'raytracer.cpp'
+source_name = 'tsp_gas.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
 bc_int = source_file_name + '.bc'
@@ -67,7 +67,6 @@ int_list = [
 ]
 
 #enum_list is extracted in text
-
 
 
 class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
@@ -156,15 +155,21 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       print "error at .o to .out\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
-    argument = './' + out_int
-    output = self.call_program('./' + out_int, limit = timeout)
-    if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
-      print 'error at running code\n'
-      print output['stderr']
-      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
-    else:
-      print 'running the code took ' + str(output['time']) + ' seconds\n'
-      return opentuner.resultsdb.models.Result(time=output['time'])
+    runtimes = []
+    for i in range(10):
+      argument = './' + out_int
+      output = self.call_program('./' + out_int, limit = timeout)
+      if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
+        print 'error at running code\n'
+        print output['stderr']
+        return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
+      else:
+        runtimes.append(float(output['time']))
+    runtimes.sort()
+
+    print runtimes
+    print 'running the code took ' + str(runtimes[1]) + ' seconds\n\n'
+    return opentuner.resultsdb.models.Result(time=runtimes[1])
 
 
   def manipulator(self):

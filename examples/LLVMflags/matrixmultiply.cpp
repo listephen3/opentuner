@@ -69,12 +69,15 @@ double test() {
 
 int main(int argc, const char** argv) {
   double returnval = test<float>();
-  if (abs(returnval - 2.91204e+12) > 1e+8){
-    std::cerr << abs(returnval - 2.91204e+12) << "\n";
+  double difference = returnval - 2.91204e+12;
+  std::cout << difference << "\n";
+  if (difference > 1e+8 || difference < -1e+8){
+    std::cerr << "Your value was " << returnval << "\n";
     std::cerr << "Value is " << returnval << "\n";
-    std::cerr << "Error, returned wrong value";
+    std::cerr << "ERROR: WRONG ANSWER";
     return 1;
   }
+  std::cout << returnval << "\n";
   return 0;
 }
 
