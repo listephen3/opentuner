@@ -10,8 +10,7 @@ timeout = 5 #seconds
 source_name = 'matrixmultiply.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
-bc_int = source_file_name + '.bc'
-s_int = source_file_name + '.s'
+ll_optimized_int = source_file_name + '_optimized.ll'
 o_int = source_file_name + '.o'
 out_int = source_file_name + '.out'
 first_run = True
@@ -25,6 +24,8 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       super(LLVMFlagsTuner, self).__init__(*pargs, **kwargs)
 
   def run(self, desired_result, input, limit):
+  	print parameterList
+  	
     global first_run
     if first_run:
       #.c to .ll, this step only needs to be done once
@@ -35,21 +36,17 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
       first_run = False
 
     #.ll to .bc
-    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
+    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -S -o ' + ll_optimized_int, limit = timeout)
     if output['returncode'] != 0:
-      print "error at .ll to .bc step\n"
+      print "error at optimizing IR\n"
+      print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.bc to .s
-    output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
+    output = self.call_program('llc ' + ll_optimized_int + ' -filetype=obj -o ' + o_int, limit = timeout)
     if output['returncode'] != 0:
+      print output['stderr']
       print "error at .bc to .s step\n"
-      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
-
-    #.s to .o
-    output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
-    if output['returncode'] != 0:
-      print "error at s to .o step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out

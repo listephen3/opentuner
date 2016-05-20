@@ -1,5 +1,7 @@
 #!/usr/bin/python
 #for LLVM v3.4
+#uses regular passes only
+#code here is slightly outdated compared to test.py (for LLVM v3.9svn)
 import opentuner
 import argparse
 import sys
@@ -89,76 +91,55 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
 
     print parameterList
     
-    '''
+    #.c to .ll only needs to be done once, and then the file is written to disk
     #.c to .ll
     output = self.call_program('clang -O0 -S -emit-llvm ' + source_name + ' -o ' + ll_int, limit = timeout)
-    print 'converting .c to .ll took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print "error at .c to .ll step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
-    '''
 
     #.ll to .bc
     output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
-    #print 'converting .ll to .bc took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print "error at .ll to .bc step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.bc to .s
     output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
-    #print 'converting .bc to .s took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print "error at .bc to .s step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.s to .o
     output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
-    #print 'converting .s to .o took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print "error at s to .o step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out
     output = self.call_program('clang -lstdc++ -lm ' + o_int + ' -o ' + out_int, limit = timeout)
-    #print 'converting .o to .out took ' + str(output['time']) + ' seconds'
     if output['returncode'] != 0:
       print "error at .o to .out\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #finally running the output program
-    argument = './' + out_int
-    output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \" $tt\"', limit = timeout)
-    #runtime is printed in ms, right after a space
-    #runtime is the last to be printed, so we take output.split(' ')[-1]
-    if ('ERROR' in output['stdout']) or output['returncode'] != 0:
+    output = self.call_program('./' + out_int, limit = timeout)
+    if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
       print 'error at running code\n'
       print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
     else:
-      runtime = float(output['stdout'].split(' ')[-1])
-      print 'running the code took ' + str(runtime/1000) + ' seconds\n'
-      return opentuner.resultsdb.models.Result(time=runtime/1000)
-
-    """
-    output = self.call_program('g++ -O2 -lm ' + source_name + ' -o ' + 'test.out', limit = timeout)
-    if output['returncode'] != 0:
-      print "error at compilation"
-    
-    output = self.call_program('./' + 'test.out', limit = timeout)
-    print 'running the code took ' + str(output['time']) + ' seconds\n'
-    return opentuner.resultsdb.models.Result(time=output['time'])
-    """
-
+      print 'running the code took ' + str(output['time']) + ' seconds\n'
+      return opentuner.resultsdb.models.Result(time=output['time'])
 
   def manipulator(self):
     m = manipulator.ConfigurationManipulator()
     flagListDuplicate = []
-    for i in range(6):
+    for i in range(3):
       flagListDuplicate.extend(self.flagList)
 
     for f in self.flagList:
-      m.add_parameter(manipulator.IntegerParameter(f, 0, 6))
+      m.add_parameter(manipulator.IntegerParameter(f, 0, 3))
     m.add_parameter(manipulator.PermutationParameter('order', flagListDuplicate))
     
     return m
@@ -193,9 +174,3 @@ if __name__ == '__main__':
   args = parser.parse_args()
   #call_program()
   LLVMFlagsTuner.main(args)
-  
-#output = self.call_program('ts=$(date +%s%N) ; ' + argument +  ' ; tt=$((($(date +%s%N) - $ts)/1000000)) ; echo \" $tt\"', limit = timeout)
-    #runtime is printed in ms, right after a space
-    #runtime is the last to be printed, so we take output.split(' ')[-1]
-#runtime = float(output['stdout'].split(' ')[-1])
-#print 'running the code took ' + str(runtime/1000) + ' seconds\n'

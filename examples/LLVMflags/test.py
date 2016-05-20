@@ -1,5 +1,6 @@
 #!/usr/bin/python
-#for LLVM v3.9
+#for LLVM v3.9svn (used March 16 2016 build)
+#uses both regular passes and hidden flags
 import opentuner
 import argparse
 import sys
@@ -7,11 +8,10 @@ import time
 from opentuner.search import manipulator
 
 timeout = 5 #seconds
-source_name = 'tsp_gas.cpp'
+source_name = 'raytracer.cpp'
 source_file_name = source_name.split('.')[0]
 ll_int = source_file_name + '.ll'
-bc_int = source_file_name + '.bc'
-s_int = source_file_name + '.s'
+ll_optimized_int = source_file_name + '_optimized.ll'
 o_int = source_file_name + '.o'
 out_int = source_file_name + '.out'
 first_run = True
@@ -89,15 +89,15 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
             print 'error at clang -O2 compilation\n'
             print output['stderr']
 
-        for i in range(50):
+        for i in range(10):
             output = self.call_program('./clangO2.out', limit = timeout)
             if ('ERROR' in output['stdout']) or output['stderr'] != '' or output['returncode'] != 0:
                 print 'error at running clang -O2 code\n'
                 print output['stderr']
             O2_times.append(output['time'])
         O2_times.sort()
-        print O2_times
-        print "Fast runtime for clang -O2 is " + str(O2_times[4]) + '\n\n\n\n'
+        print O2_times	
+        print "Fast runtime for clang -O2 is " + str(O2_times[1]) + '\n\n\n\n'
 
         print 'Now running OpenTuner'
         #Converting .c to .ll, this step only needs to be done once
@@ -107,18 +107,19 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
           return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
         first_run = False
 
+    #parameterList is '-targetlibinfo ... -verify'
     parameterList = '-targetlibinfo '
     counter = {}
     
-    for i in self.flag_list:
+    for i in self.flag_list: #setting initial count of optimization passes to 0
       counter[i] = 0
-    for i in self.extended_flag_list:
+    for i in self.extended_flag_list: #binary flags
       if cfg[i]:
         parameterList += i + ' '
-    for i in self.int_list:
+    for i in self.int_list: #int flags
       if cfg[i]:
         parameterList += i + '=' + str(cfg[i + 'val']) + ' '
-    for i in self.enum_list:
+    for i in self.enum_list: #enum flags
       if cfg[i]:
         parameterList += i + cfg[i + 'enum'] + ' '
 
@@ -131,22 +132,17 @@ class LLVMFlagsTuner(opentuner.measurement.MeasurementInterface):
     print parameterList
 
     #.ll to .bc
-    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -o ' + bc_int, limit = timeout)
+    output = self.call_program('opt ' + parameterList + ' ' + ll_int + ' -S -o ' + ll_optimized_int, limit = timeout)
     if output['returncode'] != 0:
-      print "error at .ll to .bc step\n"
+      print "error at optimizing IR\n"
       print output['stderr']
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.bc to .s
-    output = self.call_program('llc ' + bc_int + ' -o ' + s_int, limit = timeout)
+    output = self.call_program('llc ' + ll_optimized_int + ' -filetype=obj -o ' + o_int, limit = timeout)
     if output['returncode'] != 0:
+      print output['stderr']
       print "error at .bc to .s step\n"
-      return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
-
-    #.s to .o
-    output = self.call_program('as ' + s_int + ' -o ' + o_int, limit = timeout)
-    if output['returncode'] != 0:
-      print "error at s to .o step\n"
       return opentuner.resultsdb.models.Result(time=float('inf'), state='ERROR')
 
     #.o to .out
